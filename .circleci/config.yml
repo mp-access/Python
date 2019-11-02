@@ -26,7 +26,7 @@ jobs:
 
 workflows:
   version: 2
-  build-and-deploy-master:
+  build_image_and_push_to_registry:
     jobs:
       - build:
           context: Access
