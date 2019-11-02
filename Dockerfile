@@ -5,17 +5,16 @@ FROM base as builder
 RUN mkdir /install
 WORKDIR /install
 
-RUN echo "@community http://dl-cdn.alpinelinux.org/alpine/edge/community" >> /etc/apk/repositories
-RUN apk update
-
 # Required for numpy
-RUN apk --no-cache add musl-dev linux-headers g++
+RUN apk update && apk --no-cache add g++
 
 COPY requirements.txt /requirements.txt
 
 RUN pip install --install-option="--prefix=/install" -r /requirements.txt
 
 FROM base
+
+ENV PYTHONUNBUFFERED 1
 
 COPY --from=builder /install /usr/local
 
