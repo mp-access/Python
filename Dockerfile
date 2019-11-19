@@ -19,4 +19,3 @@ ENV PYTHONUNBUFFERED 1
 COPY --from=builder /install /usr/local
 
 RUN addgroup python && adduser -S python -G python
-USER python
