@@ -16,6 +16,8 @@ FROM base
 
 ENV PYTHONUNBUFFERED 1
 
+RUN apk update && apk --no-cache add git
+
 COPY --from=builder /install /usr/local
 
 RUN addgroup python && adduser -S python -G python
