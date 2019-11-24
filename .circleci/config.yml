@@ -13,7 +13,7 @@ jobs:
 
       - run:
           name: "What image will be tagged as master?"
-          command: echo "hoal/access-python:$(echo $CIRCLE_BRANCH | tr -dc '[:alnum:]\n\r' | tr '[:upper:]' '[:lower:]')""
+          command: echo "hoal/access-python:$(echo $CIRCLE_BRANCH | tr -dc '[:alnum:]\n\r' | tr '[:upper:]' '[:lower:]')"
 
       - setup_remote_docker
 
