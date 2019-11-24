@@ -70,6 +70,8 @@ workflows:
           context: Access
       - tag-master:
           context: Access
+          requires:
+            - build-only
           filters:
             branches:
               only: master
