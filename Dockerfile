@@ -5,7 +5,7 @@ FROM base as builder
 RUN mkdir /install
 WORKDIR /install
 
-# Required for numpy
+# Required for numpy. Dependencies installed here through apk are not available in the final docker image
 RUN apk update && apk --no-cache add g++
 
 COPY requirements.txt /requirements.txt
@@ -16,6 +16,7 @@ FROM base
 
 ENV PYTHONUNBUFFERED 1
 
+# Dependencies installed here through apk are available in the final docker image
 RUN apk update && apk --no-cache add git
 
 COPY --from=builder /install /usr/local
