@@ -21,3 +21,5 @@ RUN apk update && apk --no-cache add git
 COPY --from=builder /install /usr/local
 
 RUN addgroup python && adduser -S python -G python
+
+RUN git config --global user.name "Student Code Execution" && git config --global user.email "no-reply@access"
