@@ -1,6 +1,40 @@
 version: 2
 jobs:
-  build:
+  tag-master:
+    docker:
+      - image: docker:19.03.4
+
+    working_directory: ~/app
+
+    steps:
+      - run:
+          name: "What branch am I on?"
+          command: echo ${CIRCLE_BRANCH}
+
+      - run:
+          name: "What image will be tagged as master?"
+          command: echo "hoal/access-python:$(echo $CIRCLE_BRANCH | tr -dc '[:alnum:]\n\r' | tr '[:upper:]' '[:lower:]')""
+
+      - setup_remote_docker
+
+      - run:
+          name: Pull latest master image
+          command: docker pull hoal/access-python:$(echo $CIRCLE_BRANCH | tr -dc '[:alnum:]\n\r' | tr '[:upper:]' '[:lower:]')
+
+      - run:
+          name: Tag and Push Docker image
+          command: |
+            docker tag $(docker images hoal/access-python:$(echo $CIRCLE_BRANCH | tr -dc '[:alnum:]\n\r' | tr '[:upper:]' '[:lower:]') -q) hoal/access-python:3.7
+            docker tag $(docker images hoal/access-python:$(echo $CIRCLE_BRANCH | tr -dc '[:alnum:]\n\r' | tr '[:upper:]' '[:lower:]') -q) hoal/access-python:${CIRCLE_SHA1}
+
+      - run:
+          name: Push Docker image
+          command: |
+            echo $DOCKER_PWD | docker login -u $DOCKER_USERNAME --password-stdin
+            docker push hoal/access-python:3.7
+            docker push hoal/access-python:${CIRCLE_SHA1}
+            
+  build-only:
     docker:
       - image: docker:19.03.4
 
@@ -15,18 +49,27 @@ jobs:
       - setup_remote_docker
 
       - run:
+          name: Print Docker image name
+          command: echo "hoal/access-python:$(echo $CIRCLE_BRANCH | tr -dc '[:alnum:]\n\r' | tr '[:upper:]' '[:lower:]')"
+
+      - run:
           name: Build Docker image
-          command: docker build -t hoal/access-python:3.7 .
+          command: docker build -t hoal/access-python:$(echo $CIRCLE_BRANCH | tr -dc '[:alnum:]\n\r' | tr '[:upper:]' '[:lower:]') .
 
       - run:
           name: Push Docker image
           command: |
             echo $DOCKER_PWD | docker login -u $DOCKER_USERNAME --password-stdin
-            docker push hoal/access-python:3.7
+            docker push hoal/access-python:$(echo $CIRCLE_BRANCH | tr -dc '[:alnum:]\n\r' | tr '[:upper:]' '[:lower:]')
 
 workflows:
   version: 2
   build_image_and_push_to_registry:
     jobs:
-      - build:
+      - build-only:
           context: Access
+      - tag-master:
+          context: Access
+          filters:
+            branches:
+              only: master
